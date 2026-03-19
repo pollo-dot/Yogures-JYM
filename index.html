@@ -223,14 +223,14 @@ function pedir(){
   window.open(`https://wa.me/573106505193?text=${msg}`);
 }
 
-// ❤️ Admin
+// Admin
 let adminMode=false;
 function toggleAdmin(){
   document.getElementById("adminPanel").style.display = adminMode ? "none":"block";
 }
 function loginAdmin(){
   let pass = document.getElementById("adminPass").value;
-  if(pass==="1234"){ // Cambia aquí tu contraseña
+  if(pass==="236jym"){ 
     adminMode=true;
     document.getElementById("adminContent").style.display="block";
     renderAdminProducts();
