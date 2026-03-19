@@ -1,4 +1,4 @@
-const CACHE_NAME = "yogurt-jym-v3";
+const CACHE_NAME = "yogurt-jym-v2";
 
 const urlsToCache = [
   "./",
