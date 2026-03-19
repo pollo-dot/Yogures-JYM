@@ -1,29 +1,41 @@
-const CACHE_NAME = "yogurt-jym-v1";
+const CACHE_NAME = "yogurt-jym-v2";
 
 const urlsToCache = [
-  "index.html",
-  "logo.png",
-  "imagen.jpg",
-  "manifest.json"
+  "./",
+  "./index.html",
+  "./manifest.json",
+  "./logo.png",
+  "./imagen.jpg"
 ];
 
-// Instalar
-self.addEventListener("install", event => {
-  event.waitUntil(
+// INSTALAR
+self.addEventListener("install", e => {
+  e.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(urlsToCache))
   );
 });
 
-// Activar
-self.addEventListener("activate", event => {
-  console.log("Service Worker activo");
+// ACTIVAR (borra caché viejo)
+self.addEventListener("activate", e => {
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.map(key => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
+      )
+    )
+  );
 });
 
-// Fetch (modo offline)
-self.addEventListener("fetch", event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => response || fetch(event.request))
+// FETCH (cómo responde la app)
+self.addEventListener("fetch", e => {
+  e.respondWith(
+    caches.match(e.request).then(res => {
+      return res || fetch(e.request);
+    })
   );
 });
