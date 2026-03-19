@@ -1,7 +1,0 @@
-[
-  {"name":"Mora","precio":5000,"img":"imagen.jpg","ventas":0,"stock":10,"agotado":false},
-  {"name":"Mango","precio":5000,"img":"imagen.jpg","ventas":0,"stock":10,"agotado":false},
-  {"name":"Piña","precio":6000,"img":"imagen.jpg","ventas":0,"stock":10,"agotado":false},
-  {"name":"Fresa","precio":6000,"img":"imagen.jpg","ventas":0,"stock":10,"agotado":false},
-  {"name":"Premium","precio":7000,"img":"imagen.jpg","ventas":0,"stock":10,"agotado":false}
-]
