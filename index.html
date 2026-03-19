@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Yogurt JYM - Empresa</title>
-
 <style>
 body{margin:0;font-family:Arial,sans-serif;background:#eef2f3;color:#1f407d;transition:all 0.3s}
 body.dark{background:#1c1c1c;color:#4da6ff}
@@ -16,7 +15,7 @@ header .logo-container{display:flex;align-items:center;justify-content:center;po
 header .logo-container img{width:120px;border-radius:50%}
 header .logo-border{border:4px solid #25D366;padding:8px;border-radius:50%;display:inline-block;position:relative;transition:all 0.3s}
 body.dark .logo-border{border-color:#4da6ff}
-.dark-btn{position:absolute;top:15px;right:15px;background:#4da6ff;color:#fff;padding:6px 12px;border-radius:8px;cursor:pointer;transition:all 0.3s;border:none;z-index:10}
+.dark-btn{position:absolute;top:15px;right:15px;background:#4da6ff;color:#fff;padding:6px 12px;border-radius:8px;cursor:pointer;border:none;z-index:10}
 body.dark .dark-btn{background:#1f4037;color:#fff}
 .search{padding:12px}
 .search input{width:100%;padding:10px;border-radius:12px;border:1px solid #ccc;transition:all 0.3s}
@@ -50,13 +49,15 @@ body.dark .whatsapp{background:#1a7f44}
 .close{background:red;color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;margin-bottom:10px}
 body.dark .close{background:#cc0000}
 .fly{position:fixed;width:40px;height:40px;border-radius:50%;z-index:9999;transition:all .8s ease;pointer-events:none}
+
 /* Admin panel */
 #adminPanel{display:none;position:fixed;top:60px;right:10px;background:#28a745;color:#fff;padding:10px;border-radius:10px;z-index:999;max-width:300px}
 body.dark #adminPanel{background:#1a7fdd}
 #adminPanel h4{margin:5px 0}
 #adminPanel input{width:100%;margin:4px 0;padding:4px;border-radius:5px;border:1px solid #ccc}
+#adminPanel button{width:100%;padding:6px;margin:4px 0;border:none;border-radius:6px;background:#1f4037;color:#fff;cursor:pointer}
+body.dark #adminPanel button{background:#4da6ff;color:#1c1c1c}
 </style>
-
 </head>
 <body>
 
@@ -76,6 +77,7 @@ body.dark #adminPanel{background:#1a7fdd}
   <h4>Modo Administrador</h4>
   <label>Contraseña: <input type="password" id="adminPass"></label>
   <button onclick="loginAdmin()">Entrar</button>
+  <button onclick="cerrarAdmin()">Cerrar Panel</button>
   <div id="adminContent" style="display:none">
     <h4>Editar Productos</h4>
     <div id="adminProducts"></div>
@@ -109,22 +111,19 @@ let sonido = new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
 let favoritos = JSON.parse(localStorage.getItem("likes")) || [];
 function guardarLikes(){localStorage.setItem("likes",JSON.stringify(favoritos));}
 
-// Productos cargados desde JSON
-let productos=[];
-fetch('productos.json')
-.then(r=>r.json())
-.then(data=>{
-  productos = data;
-  renderProductos();
-  renderTop();
-});
+// Productos iniciales
+let productos = [
+  {name:"Mora",precio:5000,img:"imagen.jpg",ventas:0,stock:10,agotado:false},
+  {name:"Mango",precio:5000,img:"imagen.jpg",ventas:0,stock:10,agotado:false},
+  {name:"Piña",precio:6000,img:"imagen.jpg",ventas:0,stock:10,agotado:false},
+  {name:"Fresa",precio:6000,img:"imagen.jpg",ventas:0,stock:10,agotado:false},
+  {name:"Premium",precio:7000,img:"imagen.jpg",ventas:0,stock:10,agotado:false}
+];
 
-// Carrito
 let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 let total=0;
-function guardar(){localStorage.setItem("carrito",JSON.stringify(carrito));}
 
-// Modo oscuro
+function guardar(){localStorage.setItem("carrito",JSON.stringify(carrito)); localStorage.setItem("productos",JSON.stringify(productos));}
 function toggleDark(){document.body.classList.toggle("dark");}
 
 // Render Top vendido
@@ -134,7 +133,7 @@ function renderTop(){
   document.getElementById("top").innerText = `🔥 Más vendido: ${top.name}`;
 }
 
-// Render Productos
+// Render productos
 function renderProductos(lista=productos){
   const cont=document.getElementById("products");
   cont.innerHTML="";
@@ -210,7 +209,6 @@ function render(){
   });
   document.getElementById("total").innerText=total;
 }
-
 function remove(i){carrito.splice(i,1);render();guardar();}
 function toggleCart(){let p=document.getElementById("panel");p.style.display=p.style.display==="block"?"none":"block";}
 function pedir(){
@@ -226,7 +224,8 @@ function pedir(){
 // Admin
 let adminMode=false;
 function toggleAdmin(){
-  document.getElementById("adminPanel").style.display = adminMode ? "none":"block";
+  const panel = document.getElementById("adminPanel");
+  panel.style.display = adminMode ? "block" : "block"; // siempre mostrar login si no está en modo admin
 }
 function loginAdmin(){
   let pass = document.getElementById("adminPass").value;
@@ -235,6 +234,9 @@ function loginAdmin(){
     document.getElementById("adminContent").style.display="block";
     renderAdminProducts();
   } else {alert("Contraseña incorrecta");}
+}
+function cerrarAdmin(){
+  document.getElementById("adminPanel").style.display="none";
 }
 function renderAdminProducts(){
   const cont = document.getElementById("adminProducts");
@@ -247,8 +249,7 @@ function renderAdminProducts(){
         <input value="${p.img}" onchange="adminEdit(${i}, 'img', this.value)">
         <input type="number" value="${p.stock}" onchange="adminEdit(${i}, 'stock', this.value)">
         <label>Agotado<input type="checkbox" ${p.agotado?'checked':''} onchange="adminEdit(${i}, 'agotado', this.checked)"></label>
-      </div>
-    `;
+      </div>`;
   });
 }
 function adminEdit(i, field, value){
@@ -257,7 +258,13 @@ function adminEdit(i, field, value){
   renderProductos();
   renderTop();
   render();
+  guardar();
 }
+
+// Inicializar
+render();
+renderProductos();
+renderTop();
 </script>
 
 </body>
