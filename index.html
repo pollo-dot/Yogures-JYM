@@ -8,19 +8,32 @@
 <style>
 body{margin:0;font-family:Arial,sans-serif;background:#eef2f3;color:#1f407d;transition:all 0.3s}
 body.dark{background:#1c1c1c;color:#4da6ff}
+
+/* Header */
 header{background:#1f4037;color:#fff;text-align:center;padding:15px;border-bottom:4px solid #25D366;position:relative;transition:all 0.3s}
 body.dark header{background:#0d1a1a}
 header h1{margin:10px 0;font-size:24px}
 header p{font-size:14px}
+
+/* Logo con línea */
 header .logo-container{display:flex;align-items:center;justify-content:center;position:relative}
 header .logo-container img{width:120px;border-radius:50%}
 header .logo-border{border:4px solid #25D366;padding:8px;border-radius:50%;display:inline-block;position:relative;transition:all 0.3s}
 body.dark .logo-border{border-color:#4da6ff}
-.dark-btn{position:absolute;top:15px;right:15px;background:#4da6ff;color:#fff;padding:6px 12px;border-radius:8px;cursor:pointer;transition:all 0.3s;border:none;z-index:10}
+
+/* Botones */
+.dark-btn{position:absolute;top:15px;right:15px;background:#4da6ff;color:#fff;padding:6px 12px;border-radius:8px;cursor:pointer;border:none;z-index:10;transition:all 0.3s}
 body.dark .dark-btn{background:#1f4037;color:#fff}
+
+#adminBtn{position:absolute;top:15px;left:15px;background:#28a745;color:#fff;padding:6px 12px;border-radius:8px;cursor:pointer;border:none;z-index:10;transition:all 0.3s}
+body.dark #adminBtn{background:#1a7fdd;color:#fff}
+
+/* Buscador */
 .search{padding:12px}
 .search input{width:100%;padding:10px;border-radius:12px;border:1px solid #ccc;transition:all 0.3s}
 body.dark .search input{background:#333;color:#4da6ff;border:1px solid #4da6ff}
+
+/* Productos grid */
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:15px}
 .card{background:#fff;border-radius:12px;padding:10px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.1);position:relative;transition:all 0.3s}
 body.dark .card{background:#222;box-shadow:0 4px 12px rgba(0,0,0,.6)}
@@ -32,10 +45,14 @@ button{background:#1f4037;color:#fff;border:none;padding:6px 8px;border-radius:8
 body.dark button{background:#4da6ff;color:#1c1c1c}
 button.agotado{background:gray;cursor:not-allowed}
 .like{position:absolute;top:8px;right:8px;font-size:18px;cursor:pointer}
+
+/* Carrito flotante */
 .cart-btn{position:fixed;bottom:15px;right:15px;background:#1f4037;color:#fff;border-radius:50%;width:55px;height:55px;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;z-index:999}
 body.dark .cart-btn{background:#4da6ff;color:#1c1c1c}
 .cart-anim{animation:bounce .4s}
 @keyframes bounce{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
+
+/* Panel carrito */
 .panel{position:fixed;bottom:0;left:0;width:100%;background:#fff;border-top-left-radius:20px;border-top-right-radius:20px;padding:15px;box-shadow:0 -5px 20px rgba(0,0,0,.2);display:none;max-height:80vh;overflow-y:auto;z-index:998;transition:all 0.3s}
 body.dark .panel{background:#222;color:#4da6ff;box-shadow:0 -5px 20px rgba(0,0,0,.6)}
 .panel input{width:100%;padding:8px;margin:5px 0;border-radius:8px;border:1px solid #ccc;transition:all 0.3s}
@@ -49,14 +66,17 @@ body.dark .panel li{border-bottom:1px solid #4da6ff}
 body.dark .whatsapp{background:#1a7f44}
 .close{background:red;color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;margin-bottom:10px}
 body.dark .close{background:#cc0000}
+
+/* Animación fly */
 .fly{position:fixed;width:40px;height:40px;border-radius:50%;z-index:9999;transition:all .8s ease;pointer-events:none}
-/* Admin panel */
+
+/* Panel Admin */
 #adminPanel{display:none;position:fixed;top:60px;right:10px;background:#28a745;color:#fff;padding:10px;border-radius:10px;z-index:999;max-width:300px}
 body.dark #adminPanel{background:#1a7fdd}
 #adminPanel h4{margin:5px 0}
 #adminPanel input{width:100%;margin:4px 0;padding:4px;border-radius:5px;border:1px solid #ccc}
+#adminPanel button.closeAdmin{background:red;margin-top:5px}
 </style>
-
 </head>
 <body>
 
@@ -76,6 +96,7 @@ body.dark #adminPanel{background:#1a7fdd}
   <h4>Modo Administrador</h4>
   <label>Contraseña: <input type="password" id="adminPass"></label>
   <button onclick="loginAdmin()">Entrar</button>
+  <button class="closeAdmin" onclick="closeAdmin()">Cerrar Panel</button>
   <div id="adminContent" style="display:none">
     <h4>Editar Productos</h4>
     <div id="adminProducts"></div>
@@ -109,35 +130,30 @@ let sonido = new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
 let favoritos = JSON.parse(localStorage.getItem("likes")) || [];
 function guardarLikes(){localStorage.setItem("likes",JSON.stringify(favoritos));}
 
-// Productos cargados desde JSON
-let productos=[];
-fetch('productos.json')
-.then(r=>r.json())
-.then(data=>{
-  productos = data;
-  renderProductos();
-  renderTop();
-});
+// Productos
+let productos=[
+{name:"Mora",precio:5000,img:"mora.jpg",ventas:0,stock:10,agotado:false},
+{name:"Mango",precio:5000,img:"mango.jpg",ventas:0,stock:10,agotado:false},
+{name:"Piña",precio:6000,img:"pina.jpg",ventas:0,stock:10,agotado:false},
+{name:"Fresa",precio:6000,img:"fresa.jpg",ventas:0,stock:10,agotado:false},
+{name:"Premium",precio:7000,img:"premium.jpg",ventas:0,stock:10,agotado:false}
+];
 
-// Carrito
 let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-let total=0;
-function guardar(){localStorage.setItem("carrito",JSON.stringify(carrito));}
+let total = 0;
 
-// Modo oscuro
+function guardar(){localStorage.setItem("carrito",JSON.stringify(carrito));}
 function toggleDark(){document.body.classList.toggle("dark");}
 
 // Render Top vendido
 function renderTop(){
-  if(productos.length==0) return;
-  let top=[...productos].sort((a,b)=>b.ventas-a.ventas)[0];
+  let top = [...productos].sort((a,b)=>b.ventas-a.ventas)[0];
   document.getElementById("top").innerText = `🔥 Más vendido: ${top.name}`;
 }
 
 // Render Productos
 function renderProductos(lista=productos){
-  const cont=document.getElementById("products");
-  cont.innerHTML="";
+  const cont=document.getElementById("products"); cont.innerHTML="";
   lista.forEach((p,i)=>{
     let liked = favoritos.includes(i);
     cont.innerHTML+=`
@@ -146,30 +162,22 @@ function renderProductos(lista=productos){
         <img src="${p.img}" alt="${p.name}">
         <h4>${p.name}</h4>
         <div class="price">$${p.precio}</div>
-        ${p.stock>0 ? `<button onclick="add(${i}, this)">Agregar</button>` 
-                     : `<button disabled class="agotado">Agotado</button>`}
+        ${p.stock>0 ? `<button onclick="add(${i}, this)">Agregar</button>` : `<button disabled class="agotado">Agotado</button>`}
       </div>`;
   });
 }
 
 // Buscar
-function buscar(){
-  let t=document.getElementById("buscador").value.toLowerCase();
-  renderProductos(productos.filter(p=>p.name.toLowerCase().includes(t)));
-}
+function buscar(){let t=document.getElementById("buscador").value.toLowerCase(); renderProductos(productos.filter(p=>p.name.toLowerCase().includes(t)));}
 
 // Favoritos
-function toggleLike(i){
-  if(favoritos.includes(i)) favoritos=favoritos.filter(x=>x!==i);
-  else favoritos.push(i);
-  guardarLikes();
-  renderProductos();
-}
+function toggleLike(i){if(favoritos.includes(i)) favoritos=favoritos.filter(x=>x!==i); else favoritos.push(i); guardarLikes(); renderProductos();}
 
 // Agregar al carrito
 function add(i,btn){
   if(productos[i].stock<=0){alert("Producto agotado"); return;}
-  sonido.play();
+  sonido.currentTime=0; sonido.play();
+
   let img = btn.parentElement.querySelector("img");
   let rect = img.getBoundingClientRect();
   let clone = img.cloneNode(true);
@@ -177,6 +185,7 @@ function add(i,btn){
   clone.style.left=rect.left+"px";
   clone.style.top=rect.top+"px";
   document.body.appendChild(clone);
+
   let cartBtn=document.querySelector(".cart-btn");
   let cart=cartBtn.getBoundingClientRect();
   setTimeout(()=>{
@@ -187,31 +196,24 @@ function add(i,btn){
     clone.style.opacity=0;
   },10);
   setTimeout(()=>clone.remove(),800);
+
   cartBtn.classList.add("cart-anim");
   setTimeout(()=>cartBtn.classList.remove("cart-anim"),400);
+
   productos[i].stock--;
   carrito.push(productos[i]);
   productos[i].ventas++;
-  render();
-  guardar();
-  renderTop();
-  renderProductos();
+  guardar(); render(); renderTop(); renderProductos();
 }
 
-// Render carrito
+// Carrito
 function render(){
   document.getElementById("count").innerText=carrito.length;
-  let lista=document.getElementById("lista");
-  lista.innerHTML="";
-  total=0;
-  carrito.forEach((p,i)=>{
-    total+=p.precio;
-    lista.innerHTML+=`<li><img src="${p.img}">${p.name} $${p.precio} <button onclick="remove(${i})">❌</button></li>`;
-  });
+  let lista=document.getElementById("lista"); lista.innerHTML=""; total=0;
+  carrito.forEach((p,i)=>{total+=p.precio; lista.innerHTML+=`<li><img src="${p.img}" alt="${p.name}"> ${p.name} $${p.precio} <button onclick="remove(${i})">❌</button></li>`;});
   document.getElementById("total").innerText=total;
 }
-
-function remove(i){carrito.splice(i,1);render();guardar();}
+function remove(i){carrito.splice(i,1); render(); guardar();}
 function toggleCart(){let p=document.getElementById("panel");p.style.display=p.style.display==="block"?"none":"block";}
 function pedir(){
   let nombre=document.getElementById("nombre").value;
@@ -228,6 +230,8 @@ let adminMode=false;
 function toggleAdmin(){
   document.getElementById("adminPanel").style.display = adminMode ? "none":"block";
 }
+function closeAdmin(){adminMode=false; document.getElementById("adminPanel").style.display="none";}
+
 function loginAdmin(){
   let pass = document.getElementById("adminPass").value;
   if(pass==="236jym"){ 
@@ -236,29 +240,38 @@ function loginAdmin(){
     renderAdminProducts();
   } else {alert("Contraseña incorrecta");}
 }
+
 function renderAdminProducts(){
   const cont = document.getElementById("adminProducts");
   cont.innerHTML="";
   productos.forEach((p,i)=>{
     cont.innerHTML+=`
-      <div>
+      <div style="margin-bottom:8px;">
         <input value="${p.name}" onchange="adminEdit(${i}, 'name', this.value)">
         <input type="number" value="${p.precio}" onchange="adminEdit(${i}, 'precio', this.value)">
         <input value="${p.img}" onchange="adminEdit(${i}, 'img', this.value)">
         <input type="number" value="${p.stock}" onchange="adminEdit(${i}, 'stock', this.value)">
         <label>Agotado<input type="checkbox" ${p.agotado?'checked':''} onchange="adminEdit(${i}, 'agotado', this.checked)"></label>
-      </div>
-    `;
+      </div>`;
   });
 }
+
 function adminEdit(i, field, value){
   if(field==='precio' || field==='stock') value=parseInt(value);
   productos[i][field]=value;
+  localStorage.setItem("productos",JSON.stringify(productos));
   renderProductos();
   renderTop();
   render();
 }
+
+// Inicializar
+if(localStorage.getItem("productos")) productos = JSON.parse(localStorage.getItem("productos"));
+renderProductos();
+renderTop();
+render();
 </script>
 
 </body>
 </html>
+
